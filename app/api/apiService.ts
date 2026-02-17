@@ -7,6 +7,7 @@ export class ApiService {
 
   constructor() {
     this.baseURL = getApiDomain();
+    console.log("ApiService baseURL:", this.baseURL);
     this.defaultHeaders = {
       "Content-Type": "application/json",
       "Access-Control-Allow-Origin": "*",

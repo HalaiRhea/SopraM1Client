@@ -3,25 +3,30 @@
 import { useRouter } from "next/navigation";
 import { useApi } from "@/hooks/useApi";
 import useLocalStorage from "@/hooks/useLocalStorage";
-import Link from "next/link";
 import { User } from "@/types/user";
 import { Button, Form, Input } from "antd";
+import Link from "next/link";
 
-interface LoginFormValues {
+interface RegisterFormValues {
   username: string;
   password: string;
+  bio?: string;
 }
 
-const Login: React.FC = () => {
+const Register: React.FC = () => {
   const router = useRouter();
   const apiService = useApi();
   const [form] = Form.useForm();
 
   const { set: setToken } = useLocalStorage<string>("token", "");
-
-  const handleLogin = async (values: LoginFormValues) => {
+  const handleRegister = async (values: RegisterFormValues) => {
     try {
-      const response = await apiService.post<User>("/login", values);
+      const response = await apiService.post<User>("/users", {
+            username: values.username,
+            password: values.password,
+            bio: values.bio ?? "",
+        });
+
 
       if (response.token) {
         setToken(response.token);
@@ -30,9 +35,9 @@ const Login: React.FC = () => {
       router.push("/users");
     } catch (error) {
       if (error instanceof Error) {
-        alert(`Login failed:\n${error.message}`);
+        alert(`Registration failed:\n${error.message}`);
       } else {
-        console.error("Unknown login error.");
+        console.error("Unknown registration error.");
       }
     }
   };
@@ -41,10 +46,10 @@ const Login: React.FC = () => {
     <div className="login-container">
       <Form
         form={form}
-        name="login"
+        name="register"
         size="large"
         variant="outlined"
-        onFinish={handleLogin}
+        onFinish={handleRegister}
         layout="vertical"
       >
         <Form.Item
@@ -63,16 +68,26 @@ const Login: React.FC = () => {
           <Input.Password placeholder="Enter password" />
         </Form.Item>
 
-        <Form.Item>
-          <Button type="primary" htmlType="submit" className="login-button">
-            Login
-          </Button>
+        <Form.Item
+          name="bio"
+          label="Bio"
+          rules={[{ required: false }]}
+        >
+          <Input.TextArea
+            placeholder="Tell us something about yourself (optional)"
+            rows={3}
+          />
         </Form.Item>
 
         <Form.Item>
+          <Button type="primary" htmlType="submit" className="login-button">
+            Sign up
+          </Button>
+        </Form.Item>
+        <Form.Item>
           <span>
-            Don&apos;t have an account?{" "}
-            <Link href="/register">Register here</Link>
+            Already have an account?{" "}
+            <Link href="/login">Log in Here</Link>
           </span>
         </Form.Item>
       </Form>
@@ -80,4 +95,4 @@ const Login: React.FC = () => {
   );
 };
 
-export default Login;
+export default Register;
