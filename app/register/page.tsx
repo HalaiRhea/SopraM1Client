@@ -18,7 +18,9 @@ const Register: React.FC = () => {
   const apiService = useApi();
   const [form] = Form.useForm();
 
-  const { set: setToken } = useLocalStorage<string>("token", "");
+  const { set: setUserId } = useLocalStorage<string>("userId", "");
+  const { set: setUsername } = useLocalStorage<string>("username", "");
+
   const handleRegister = async (values: RegisterFormValues) => {
     try {
       const response = await apiService.post<User>("/users", {
@@ -28,9 +30,11 @@ const Register: React.FC = () => {
         });
 
 
-      if (response.token) {
-        setToken(response.token);
+      if (response.id && response.username) {
+        setUserId(response.id.toString());
+        setUsername(response.username);
       }
+
 
       router.push("/users");
     } catch (error) {

@@ -17,15 +17,20 @@ const Login: React.FC = () => {
   const apiService = useApi();
   const [form] = Form.useForm();
 
-  const { set: setToken } = useLocalStorage<string>("token", "");
+  const { set: setUserId } = useLocalStorage<string>("userId", "");
+  const { set: setUsername } = useLocalStorage<string>("username", "");
+
 
   const handleLogin = async (values: LoginFormValues) => {
     try {
       const response = await apiService.post<User>("/login", values);
 
-      if (response.token) {
-        setToken(response.token);
+      if (response.id && response.username) {
+        setUserId(response.id.toString());
+        setUsername(response.username);
       }
+
+
 
       router.push("/users");
     } catch (error) {

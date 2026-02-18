@@ -30,20 +30,38 @@ const Dashboard: React.FC = () => {
   const router = useRouter();
   const apiService = useApi();
   const [users, setUsers] = useState<User[] | null>(null);
-  // useLocalStorage hook example use
-  // The hook returns an object with the value and two functions
-  // Simply choose what you need from the hook:
-  const {
-    // value: token, // is commented out because we dont need to know the token value for logout
-    // set: setToken, // is commented out because we dont need to set or update the token value
-    clear: clearToken, // all we need in this scenario is a method to clear the token
-  } = useLocalStorage<string>("token", ""); // if you wanted to select a different token, i.e "lobby", useLocalStorage<string>("lobby", "");
-
-  const handleLogout = (): void => {
-    // Clear token using the returned function 'clear' from the hook
-    clearToken();
-    router.push("/login");
+  const [hydrated, setHydrated] = useState(false);
+  const handleLogout = async (): Promise<void> => {
+  try {
+      if (userId) {
+        await apiService.post<void>(`/logout/${userId}`, {});
+      }
+    } catch (error) {
+  console.error("Logout error:", error);
+    } finally {
+      clearUserId();
+      router.push("/login");
+    }
   };
+
+
+  const { value: userId, clear: clearUserId } =
+    useLocalStorage<string>("userId", "");
+
+  useEffect(() => {
+    setHydrated(true);
+  }, []);
+
+  useEffect(() => {
+    if (!hydrated) return;
+    if (!userId) {
+      router.push("/login");
+    }
+  }, [hydrated, userId, router]);
+
+
+
+
 
   useEffect(() => {
     const fetchUsers = async () => {

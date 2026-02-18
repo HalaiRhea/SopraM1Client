@@ -28,16 +28,16 @@ const Profile: React.FC = () => {
         const user: User = await apiService.get<User>(`/users/${userId}`);
         setUser(user);
       } catch (error) {
-        if (error instanceof Error) {
-          alert(`Failed to load user profile:\n${error.message}`);
-        } else {
-          console.error("Unknown error while loading user profile.");
-        }
+        alert("Failed to load user profile.");
       }
     };
 
     fetchUser();
+
+    window.addEventListener("focus", fetchUser);
+    return () => window.removeEventListener("focus", fetchUser);
   }, [apiService, userId]);
+
 
   const profileData: ProfileRow[] | null = user
     ? [
