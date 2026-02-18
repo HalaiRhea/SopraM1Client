@@ -5,7 +5,7 @@ import { useParams, useRouter } from "next/navigation";
 import { useApi } from "@/hooks/useApi";
 import useLocalStorage from "@/hooks/useLocalStorage";
 import { User } from "@/types/user";
-import { Button, Card, Table } from "antd";
+import { Button, Card, Input, Table } from "antd";
 
 interface ProfileRow {
   key: string;
@@ -17,9 +17,43 @@ const Profile: React.FC = () => {
   const router = useRouter();
   const params = useParams();
   const apiService = useApi();
+  const [hydrated, setHydrated] = useState(false);
   const [user, setUser] = useState<User | null>(null);
-
+  const { value: loggedInUserId } =
+    useLocalStorage<string>("userId", "");
   const userId = params.id as string;
+  const isOwnProfile = loggedInUserId === userId;
+  const [editingPassword, setEditingPassword] = useState(false);
+  const [newPassword, setNewPassword] = useState("");
+
+  const handleChangePassword = async () => {
+    try {
+      await apiService.put(`/users/${userId}`, {
+        password: newPassword,
+      });
+
+      await apiService.post<void>(`/logout/${userId}`, {});
+
+      localStorage.removeItem("userId");
+      router.push("/login");
+    } catch (error) {
+      alert("Failed to change password");
+    }
+  };
+
+
+  useEffect(() => {
+    setHydrated(true);
+  }, []);
+
+  useEffect(() => {
+    if (!hydrated) return;
+
+    if (!loggedInUserId) {
+      router.push("/login");
+    }
+  }, [hydrated, loggedInUserId, router]);
+
 
 
   useEffect(() => {
@@ -91,13 +125,38 @@ const Profile: React.FC = () => {
               rowKey="key"
             />
 
-            <Button
-              type="primary"
-              style={{ marginTop: "16px" }}
-              onClick={() => router.push("/users")}
-            >
-              Back
-            </Button>
+            <div style={{ display: "flex", gap: "8px", marginTop: "16px" }}>
+              <Button type="primary" onClick={() => router.push("/users")}>
+                Back
+              </Button>
+              {isOwnProfile && (
+                <Button onClick={() => setEditingPassword(true)}>
+                  Change Password
+                </Button>
+              )}
+            </div>
+            {editingPassword && (
+              <div style={{ marginTop: "16px" }}>
+                <Input.Password
+                  placeholder="New password"
+                  value={newPassword}
+                  onChange={(e) => setNewPassword(e.target.value)}
+                  style={{ maxWidth: "300px", marginBottom: "8px" }}
+                />
+                <div style={{ display: "flex", gap: "8px" }}>
+                  <Button
+                    type="primary"
+                    onClick={handleChangePassword}
+                    disabled={!newPassword}
+                  >
+                    Save
+                  </Button>
+                  <Button onClick={() => setEditingPassword(false)}>
+                    Cancel
+                  </Button>
+                </div>
+              </div>
+            )}
           </>
         )}
       </Card>

@@ -32,16 +32,16 @@ const Dashboard: React.FC = () => {
   const [users, setUsers] = useState<User[] | null>(null);
   const [hydrated, setHydrated] = useState(false);
   const handleLogout = async (): Promise<void> => {
-  try {
-      if (userId) {
-        await apiService.post<void>(`/logout/${userId}`, {});
+    try {
+        if (userId) {
+          await apiService.post<void>(`/logout/${userId}`, {});
+        }
+      } catch (error) {
+        console.error("Logout error:", error);
+      } finally {
+        clearUserId();
+        router.push("/login");
       }
-    } catch (error) {
-  console.error("Logout error:", error);
-    } finally {
-      clearUserId();
-      router.push("/login");
-    }
   };
 
 
@@ -58,10 +58,6 @@ const Dashboard: React.FC = () => {
       router.push("/login");
     }
   }, [hydrated, userId, router]);
-
-
-
-
 
   useEffect(() => {
     const fetchUsers = async () => {
