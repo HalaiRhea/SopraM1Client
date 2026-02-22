@@ -10,7 +10,7 @@ import { Button, Card, Input, Table } from "antd";
 interface ProfileRow {
   key: string;
   attribute: string;
-  value: string;
+  value: string | null;
 }
 
 const Profile: React.FC = () => {
@@ -88,7 +88,9 @@ const Profile: React.FC = () => {
         {
           key: "creationDate",
           attribute: "Creation Date",
-          value: new Date(user.creationDate).toLocaleDateString(),
+          value: user.creationDate
+            ? new Date(user.creationDate).toLocaleDateString()
+            : "(unknown)",
         },
         {
           key: "bio",
