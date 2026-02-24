@@ -110,14 +110,13 @@ const Profile: React.FC = () => {
         {profileData && (
           <>
             <Table<ProfileRow>
+              showHeader={false}
               columns={[
                 {
-                  title: "Attribute",
                   dataIndex: "attribute",
                   key: "attribute",
                 },
                 {
-                  title: "",
                   dataIndex: "value",
                   key: "value",
                 },

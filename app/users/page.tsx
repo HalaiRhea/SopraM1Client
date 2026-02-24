@@ -60,11 +60,8 @@ const Dashboard: React.FC = () => {
   useEffect(() => {
     const fetchUsers = async () => {
       try {
-        // apiService.get<User[]> returns the parsed JSON object directly,
-        // thus we can simply assign it to our users variable.
         const users: User[] = await apiService.get<User[]>("/users");
         setUsers(users);
-        console.log("Fetched users:", users);
       } catch (error) {
         if (error instanceof Error) {
           alert(`Something went wrong while fetching users:\n${error.message}`);
@@ -94,6 +91,11 @@ const Dashboard: React.FC = () => {
               columns={columns}
               dataSource={users}
               rowKey="id"
+              rowClassName={(record) =>
+                record.id != null && record.id.toString() === userId
+                  ? "current-user-row"
+                  : ""
+              }
               onRow={(row) => ({
                 onClick: () => router.push(`/users/${row.id}`),
                 style: { cursor: "pointer" },
