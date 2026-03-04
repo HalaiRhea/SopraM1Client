@@ -62,6 +62,7 @@ const Dashboard: React.FC = () => {
       try {
         const users: User[] = await apiService.get<User[]>("/users");
         setUsers(users);
+        console.log("Fetched users:", users);
       } catch (error) {
         if (error instanceof Error) {
           alert(`Something went wrong while fetching users:\n${error.message}`);

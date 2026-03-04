@@ -31,12 +31,13 @@ const Register: React.FC = () => {
 
 
       if (response.id && response.username) {
-        setUserId(response.id.toString());
+        const id = response.id.toString();
+
+        setUserId(id);
         setUsername(response.username);
+
+        router.push(`/users/${id}`);
       }
-
-
-      router.push("/users");
     } catch (error) {
       if (error instanceof Error) {
         alert(`Registration failed:\n${error.message}`);

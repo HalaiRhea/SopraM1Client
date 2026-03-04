@@ -128,7 +128,7 @@ const Profile: React.FC = () => {
 
             <div style={{ display: "flex", gap: "8px", marginTop: "16px" }}>
               <Button type="primary" onClick={() => router.push("/users")}>
-                Back
+                User List
               </Button>
               {isOwnProfile && (
                 <Button onClick={() => setEditingPassword(true)}>
